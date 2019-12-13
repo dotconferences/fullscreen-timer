@@ -58,6 +58,10 @@ body {
   background: #666;
 }
 
+.clock.show-cursor-red .time.redblink {
+  color: #e73148;
+}
+
 .tips {
   position: fixed;
   left: 50%;
@@ -65,9 +69,23 @@ body {
   transform: translateX(-50%);
   color: #666;
   line-height: 2;
+  width:500px;
 }
+
+.tips .col-left {
+  width:40%;
+  margin-right:10%;
+  float: left;
+}
+
+.tips .col-right {
+  width:40%;
+  float: right;
+}
+
 .tips li {
   text-align: left;
+  list-style: none;
 }
 .tips button {
   background: rgba(0,0,0,0);

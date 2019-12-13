@@ -17,6 +17,8 @@ class App extends Component {
       adjusting: false,
       editing: null, // minute, second, null
       showCursor: false,
+      redblink: null,
+      redCursor: false,
     }
     this.timer = null;
   }
@@ -34,18 +36,29 @@ class App extends Component {
   }
 
   tick() {
-    const { mode, paused, showCursor, editing } = this.state;
+    const { mode, paused, showCursor, redCursor, editing, redblink } = this.state;
     if (editing) {
       this.setState({ showCursor: !showCursor });
     }
+    if (redblink) {
+      this.setState({ redCursor: !redCursor });
+    }
     if (paused) return;
     this.setState((prevState) => {
-      const t = prevState.t + (mode === 'countdown' ? -1 : 1) * 0.5;
+      const t = prevState.t + (mode === 'stopwatch' ? -1 : 1) * 0.5;
       if (t <= 0) {
         return {
           t: 0,
           paused: true,
         }
+      }
+      else if (t <= 60) {
+        return {
+          t: t,
+          paused: false,   
+          redblink: true,
+        }
+        
       } else {
         return {
           t,
@@ -73,11 +86,25 @@ class App extends Component {
     });
   }
 
-  switchMode = (mode) => {
+  setTimerto18 = () => {
     this.setState({
-      mode: mode || (this.state.mode === 'stopwatch' ? 'countdown' : 'stopwatch'),
-    })
+      t: 60*18,
+      paused: true
+    });
   }
+
+  setTimerto4 = () => {
+    this.setState({
+      t: 60*4,
+      paused: true
+    });
+  }
+
+  // switchMode = (mode) => {
+  //   this.setState({
+  //     mode: mode || (this.state.mode === 'stopwatch' ? 'countdown' : 'stopwatch'),
+  //   })
+  // }
 
   pauseTimer = () => {
     this.setState({
@@ -145,58 +172,80 @@ class App extends Component {
       case ' ':
         this.pauseTimer();
         break;
+      case 'K':
+      case 'k':
+        this.setTimerto18();
+        break;
+      case 'L':
+      case 'l':
+        this.setTimerto4();
+        break;
       default:
         break;
     }
   }
 
   render() {
-    const { t, paused, editing, mode, showCursor, fullscreen } = this.state;
+    const { t, paused, editing, redblink, mode, showCursor, redCursor, fullscreen } = this.state;
     const second = parseInt(t % 60);
     const minute = parseInt((t - second) / 60);
     return (
       <div className="App">
         <div
-          className={clsx('clock', { 'show-cursor': showCursor })}
+          className={clsx('clock', { 'show-cursor': showCursor }, { 'show-cursor-red': redCursor })}
           onDoubleClick={() => this.toggleFullScreen()}
         >
-          <span className={clsx('time minute', { editing: editing === 'minute' })}>{pad(minute)}</span>
-          :
-          <span className={clsx('time second', { editing: editing === 'second' })}>{pad(second)}</span>
+          <span className={clsx('time minute', { editing: editing === 'minute' }, { redblink: redblink === true })}>{pad(minute)}</span>
+          <span className={clsx('time', { redblink: redblink === true })}>:</span>
+          <span className={clsx('time second', { editing: editing === 'second' }, { redblink: redblink === true })}>{pad(second)}</span>
         </div>
         <ul className="tips">
-          <li>
-            <button onClick={this.toggleFullScreen}>F</button>
-            -
-            <span className="tip">{fullscreen ? 'exit': 'enter'} fullscreen</span>
-          </li>
-          <li>
-            <button onClick={() => this.handleCursorMove('left')}>←</button>
-            <button onClick={() => this.handleCursorMove('right')}>→</button>
-            <button onClick={() => this.handleCursorMove('up')}>↑</button>
-            <button onClick={() => this.handleCursorMove('down')}>↓</button>
-            -
-            <span className="tip">edit timer</span>
-          </li>
-          <li>
-            <button onClick={this.resetTimer}>R</button>
-            -
-            <span className="tip">reset timer</span>
-          </li>
-          <li>
-            <button onClick={this.switchMode}>S</button>
-            -
-            {mode === 'countdown' ?
-              <span className="tip"><span>countdown ✓</span> or <button onClick={() => this.switchMode('stopwatch')}>stopwatch</button></span>
-              :
-              <span className="tip"><button onClick={() => this.switchMode('countdown')}>countdown</button> or <span>stopwatch ✓</span></span>
-            }
-          </li>
-          <li>
-            <button onClick={this.pauseTimer}>Space</button>
-            -
-            <span className="tip">{paused ? 'start' : 'pause'} timer</span>
-          </li>
+          <div class="col-left">
+            <li>
+              <button onClick={this.toggleFullScreen}>F</button>
+              -
+              <span className="tip">{fullscreen ? 'exit': 'enter'} fullscreen</span>
+            </li>
+            <li>
+              <button onClick={() => this.handleCursorMove('left')}>←</button>
+              <button onClick={() => this.handleCursorMove('right')}>→</button>
+              <button onClick={() => this.handleCursorMove('up')}>↑</button>
+              <button onClick={() => this.handleCursorMove('down')}>↓</button>
+              -
+              <span className="tip">edit timer</span>
+            </li>
+            <li>
+              <button onClick={this.resetTimer}>R</button>
+              -
+              <span className="tip">reset timer</span>
+            </li>
+            {/* <li>
+              <button onClick={this.switchMode}>S</button>
+              -
+              {mode === 'countdown' ?
+                <span className="tip"><span>countdown ✓</span> or <button onClick={() => this.switchMode('stopwatch')}>stopwatch</button></span>
+                :
+                <span className="tip"><button onClick={() => this.switchMode('countdown')}>countdown</button> or <span>stopwatch ✓</span></span>
+              }
+            </li> */}
+          </div>
+          <div class="col-right">
+            <li>
+              <button onClick={this.pauseTimer}>Space</button>
+              -
+              <span className="tip">{paused ? 'start' : 'pause'} timer</span>
+            </li>
+            <li>
+              <button onClick={this.setTimerto18}>K</button>
+              -
+              <span className="tip">Set to 18min</span>
+            </li>
+            <li>
+              <button onClick={this.setTimerto4}>L</button>
+              -
+              <span className="tip">Set to 4min</span>
+            </li>
+          </div>
         </ul>
       </div>
     );
