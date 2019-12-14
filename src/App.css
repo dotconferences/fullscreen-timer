@@ -108,3 +108,22 @@ body {
   font-size: inherit;
   padding: 0;
 }
+.credits {
+  position:absolute;
+  bottom:20px;
+  right:20px;
+  font-size:12px;
+}
+.credits span {
+  width: 16px;
+  top: 3px;
+  position: relative;
+  margin-right: 4px;
+}
+.credits a {
+  color:#666;
+  text-decoration: none;
+}
+.credits span, .credits p {
+  display:inline-block;
+}
