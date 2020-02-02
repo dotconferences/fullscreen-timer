@@ -55,13 +55,15 @@ class App extends Component {
       else if (t <= 60) {
         return {
           t: t,
-          paused: false,   
+          paused: false,
           redblink: true,
         }
-        
+
       } else {
         return {
           t,
+          paused: false,
+          redblink: false
         }
       }
     });
@@ -73,7 +75,7 @@ class App extends Component {
       document.documentElement.requestFullscreen();
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen(); 
+        document.exitFullscreen();
       }
     }
     this.setState({ fullscreen: !fullscreen });
@@ -82,21 +84,24 @@ class App extends Component {
   resetTimer = () => {
     this.setState({
       t: 0,
-      paused: true
+      paused: true,
+      redblink: false
     });
   }
 
   setTimerto18 = () => {
     this.setState({
       t: 60*18,
-      paused: true
+      paused: true,
+      redblink: false
     });
   }
 
   setTimerto4 = () => {
     this.setState({
       t: 60*4,
-      paused: true
+      paused: true,
+      redblink: false
     });
   }
 
@@ -109,6 +114,7 @@ class App extends Component {
   pauseTimer = () => {
     this.setState({
       paused: !this.state.paused,
+      redblink: false,
       editing: false,
     })
   }
@@ -117,6 +123,7 @@ class App extends Component {
     const { editing } = this.state;
     this.setState({
       editing: editing ? null : 'second',
+      redblink: false
     });
   }
 
@@ -143,6 +150,7 @@ class App extends Component {
       default:
         break;
     }
+    state.redblink = false;
     this.setState(state);
   }
 
